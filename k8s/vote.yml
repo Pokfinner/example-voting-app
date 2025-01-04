@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote
+  namespace: voting-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vote
+  template:
+    metadata:
+      labels:
+        app: vote
+    spec:
+      containers:
+      - name: vote
+        image: ghenac/voting-app-vote:latest
+        env:
+          - name: REDIS_HOST
+            value: redis
+          - name: REDIS_PORT
+            value: "6379"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: vote-source
+          mountPath: users/ghenadie/desktop/voting_app_solution/example-voting-app/vote
+      volumes:
+      - name: vote-source
+        hostPath:
+          path: ./vote
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vote
+  namespace: voting-app
+spec:
+  selector:
+    app: vote
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 80
+

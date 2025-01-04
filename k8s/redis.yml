@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: voting-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: healthchecks
+          mountPath: users/ghenadie/desktop/voting_app_solution/example-voting-app/healthchecks
+        livenessProbe:
+          exec:
+            command:
+            - /healthchecks/redis.sh
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: healthchecks
+        hostPath:
+          path: users/ghenadie/desktop/voting_app_solution/example-voting-app/healthchecks
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: voting-app
+spec:
+  selector:
+    app: redis
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+  
+

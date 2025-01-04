@@ -30,7 +30,6 @@ services:
       - ./result:/usr/local/app
     ports:
       - "8081:80"
-      - "127.0.0.1:9229:9229"
     networks:
       - front-tier
       - back-tier
@@ -42,6 +41,12 @@ services:
         condition: service_healthy 
       db:
         condition: service_healthy 
+    environment:
+      DB_HOST: "db"             # The hostname of the database service
+      DB_USERNAME: "postgres"   # Default username for the database
+      DB_PASSWORD: "postgres"   # Default password for the database
+      DB_NAME: "postgres"       # Default database name
+      REDIS_HOST: "redis"       # The hostname of the Redis service
     networks:
       - back-tier
 

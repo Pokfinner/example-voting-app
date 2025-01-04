@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result
+  namespace: voting-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+    spec:
+      containers:
+      - name: result
+        image: ghenac/voting-app-result:latest
+        env:
+          - name: REDIS_HOST
+            value: redis
+          - name: REDIS_PORT
+            value: "6379"
+        command: ["nodemon", "--inspect=0.0.0.0", "server.js"]
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: result-source
+          mountPath: users/ghenadie/desktop/voting_app_solution/example-voting-app/result
+      volumes:
+      - name: result-source
+        hostPath:
+          path: ./result
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result
+  namespace: voting-app
+spec:
+  selector:
+    app: result
+  ports:
+  - protocol: TCP
+    port: 8081
+    targetPort: 80
+  
+

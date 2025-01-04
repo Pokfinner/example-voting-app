@@ -73,7 +73,7 @@
           - name: frontend-network
         restart_policy: always
         env:
-          REDIS_HOST: "10.0.2.150"  # This is how the worker will connect to Redis container by using the container name as hostname
+          REDIS_HOST: "10.0.2.150"  # This is how the worker will connect to Redis container (replace the IP with your instance IP where redis container runs)
           REDIS_PORT: "6379"
         exposed_ports:
           - "80"

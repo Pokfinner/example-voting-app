@@ -14,7 +14,7 @@ services:
       - back-tier
 
   result:
-    image: ghenac/voting-app:result
+    image: ghenac/voting-app-result:latest
     depends_on:
       db:
         condition: service_healthy 
