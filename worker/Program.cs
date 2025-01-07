@@ -65,7 +65,8 @@ namespace Worker
                             pgsql = OpenDbConnection(pgConnectionString);
                         }
                         else
-                        { // Normal +1 vote requested
+                        {
+                            // Normal +1 vote requested
                             UpdateVote(pgsql, vote.voter_id, vote.vote);
                         }
                     }
@@ -109,10 +110,12 @@ namespace Worker
             Console.Error.WriteLine("Connected to db");
 
             var command = connection.CreateCommand();
-            command.CommandText = @"CREATE TABLE IF NOT EXISTS votes (
-                                        id VARCHAR(255) NOT NULL UNIQUE,
-                                        vote VARCHAR(255) NOT NULL
-                                    )";
+            command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS votes (
+                    id VARCHAR(255) NOT NULL UNIQUE,
+                    vote VARCHAR(255) NOT NULL
+                )
+            ";
             command.ExecuteNonQuery();
 
             return connection;
@@ -148,22 +151,19 @@ namespace Worker
 
         private static void UpdateVote(NpgsqlConnection connection, string voterId, string vote)
         {
-            var command = connection.CreateCommand();
-            try
+            // Use ON CONFLICT (id) to avoid duplicate key errors and update existing rows.
+            using (var command = connection.CreateCommand())
             {
-                command.CommandText = "INSERT INTO votes (id, vote) VALUES (@id, @vote)";
+                command.CommandText = @"
+                    INSERT INTO votes (id, vote)
+                    VALUES (@id, @vote)
+                    ON CONFLICT (id) DO UPDATE
+                       SET vote = EXCLUDED.vote
+                ";
                 command.Parameters.AddWithValue("@id", voterId);
                 command.Parameters.AddWithValue("@vote", vote);
+
                 command.ExecuteNonQuery();
-            }
-            catch (DbException)
-            {
-                command.CommandText = "UPDATE votes SET vote = @vote WHERE id = @id";
-                command.ExecuteNonQuery();
-            }
-            finally
-            {
-                command.Dispose();
             }
         }
     }

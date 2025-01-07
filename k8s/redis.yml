@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,37 +15,37 @@ spec:
         app: redis
     spec:
       containers:
-      - name: redis
-        image: redis:alpine
-        ports:
-        - containerPort: 6379
-        volumeMounts:
-        - name: healthchecks
-          mountPath: users/ghenadie/desktop/voting_app_solution/example-voting-app/healthchecks
-        livenessProbe:
-          exec:
-            command:
-            - /healthchecks/redis.sh
-          initialDelaySeconds: 10
-          periodSeconds: 5
-      volumes:
-      - name: healthchecks
-        hostPath:
-          path: users/ghenadie/desktop/voting_app_solution/example-voting-app/healthchecks
+        - name: redis
+          image: redis:alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+      #   volumeMounts:
+      #   - name: healthchecks
+      #     mountPath: /healthchecks  # Corrected mountPath
+      #   livenessProbe:
+      #     exec:
+      #       command:
+      #       - /healthchecks/redis.sh
+      #     initialDelaySeconds: 10
+      #     periodSeconds: 5
+      # volumes:
+      # - name: healthchecks
+      #   hostPath:
+      #     path: /healthchecks  # Ensure this is the correct host path
+
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: redis-svc
   namespace: voting-app
 spec:
   selector:
     app: redis
   ports:
-  - protocol: TCP
-    port: 6379
-    targetPort: 6379
-    ###
-  
-
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP

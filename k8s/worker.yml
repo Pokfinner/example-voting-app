@@ -15,32 +15,33 @@ spec:
     spec:
       containers:
       - name: worker
-        image: ghenac/voting-app-worker:latest
+        image: ghenac/voting-app-worker:v2
+        imagePullPolicy: IfNotPresent
         env:
-        - name: DB_HOST
-          value: "db"
-        - name: DB_USERNAME
-          value: "postgres"
-        - name: DB_PASSWORD
-          value: "postgres"
-        - name: DB_NAME
-          value: "postgres"
-        - name: REDIS_HOST
-          value: "redis"
+          - name: DB_HOST
+            value: "db-svc"
+          - name: DB_USERNAME
+            value: "postgres"
+          - name: DB_PASSWORD
+            value: "postgres"
+          - name: DB_NAME
+            value: "postgres"
+          - name: REDIS_HOST
+            value: "redis-svc"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: worker
+  name: worker-svc
   namespace: voting-app
 spec:
   selector:
     app: worker
   ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
   type: ClusterIP
 
 

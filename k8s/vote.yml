@@ -16,32 +16,33 @@ spec:
       containers:
       - name: vote
         image: ghenac/voting-app-vote:latest
+        imagePullPolicy: IfNotPresent
         env:
           - name: REDIS_HOST
-            value: redis
+            value: "redis-svc"
           - name: REDIS_PORT
             value: "6379"
         ports:
-        - containerPort: 80
+          - containerPort: 80
         volumeMounts:
-        - name: vote-source
-          mountPath: users/ghenadie/desktop/voting_app_solution/example-voting-app/vote
+          - name: vote-source
+            mountPath: /app
       volumes:
-      - name: vote-source
-        hostPath:
-          path: ./vote
+        - name: vote-source
+          hostPath:
+            path: /users/ghenadie/desktop/voting_app_solution/example-voting-app/vote
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: vote
+  name: vote-svc
   namespace: voting-app
 spec:
   selector:
     app: vote
   ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 80
-
+    - protocol: TCP
+      port: 8080
+      targetPort: 80
+  type: LoadBalancer

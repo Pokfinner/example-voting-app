@@ -16,34 +16,41 @@ spec:
       containers:
       - name: result
         image: ghenac/voting-app-result:latest
+        imagePullPolicy: IfNotPresent
         env:
-          - name: REDIS_HOST
-            value: redis
-          - name: REDIS_PORT
-            value: "6379"
+          - name: PG_HOST
+            value: "db-svc"
+          - name: PG_PORT
+            value: "5432"
+          - name: PG_USERNAME
+            value: "postgres"
+          - name: PG_PASSWORD
+            value: "postgres"
+          - name: PG_DATABASE
+            value: "postgres"
         command: ["nodemon", "--inspect=0.0.0.0", "server.js"]
         ports:
-        - containerPort: 80
+          - containerPort: 80
         volumeMounts:
-        - name: result-source
-          mountPath: users/ghenadie/desktop/voting_app_solution/example-voting-app/result
+          - name: result-source
+            mountPath: /app
       volumes:
-      - name: result-source
-        hostPath:
-          path: ./result
+        - name: result-source
+          hostPath:
+            path: /users/ghenadie/desktop/voting_app_solution/example-voting-app/result
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: result
+  name: result-svc
   namespace: voting-app
 spec:
   selector:
     app: result
   ports:
-  - protocol: TCP
-    port: 8081
-    targetPort: 80
-  
+    - protocol: TCP
+      port: 8081
+      targetPort: 80
+  type: LoadBalancer
 
