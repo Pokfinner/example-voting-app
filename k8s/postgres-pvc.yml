@@ -4,6 +4,7 @@ metadata:
   name: postgres-pvc
   namespace: voting-app
 spec:
+  storageClassName: ""
   accessModes:
   - ReadWriteOnce
   resources:
