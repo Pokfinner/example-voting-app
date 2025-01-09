@@ -20,19 +20,19 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6379
-      #   volumeMounts:
-      #   - name: healthchecks
-      #     mountPath: /healthchecks  # Corrected mountPath
-      #   livenessProbe:
-      #     exec:
-      #       command:
-      #       - /healthchecks/redis.sh
-      #     initialDelaySeconds: 10
-      #     periodSeconds: 5
-      # volumes:
-      # - name: healthchecks
-      #   hostPath:
-      #     path: /healthchecks  # Ensure this is the correct host path
+          volumeMounts:
+          - name: healthchecks
+            mountPath: /healthchecks  # Corrected mountPath
+          livenessProbe:
+            exec:
+              command:
+              - /healthchecks/redis.sh
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+      - name: healthchecks
+        hostPath:
+          path: /healthchecks  # Ensure this is the correct host path
 
 
 ---
