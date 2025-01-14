@@ -27,21 +27,26 @@ spec:
           volumeMounts:
           - name: postgres-data
             mountPath: /var/lib/postgresql/data
-          - name: healthchecks
-            mountPath: users/ghenadie/desktop/voting_app_solution/example-voting-app/healthchecks
-            livenessProbe:
-              exec:
-                command:
-                - /healthchecks/postgres.sh
-              initialDelaySeconds: 10
-              periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - psql
+              - --username=postgres
+              - --command=SELECT 1;
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+              - psql
+              - --username=postgres
+              - --command=SELECT 1;
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-pvc
-        - name: healthchecks
-          hostPath:
-            path: users/ghenadie/desktop/voting_app_solution/example-voting-app/healthchecks
 
 ---
 apiVersion: v1
